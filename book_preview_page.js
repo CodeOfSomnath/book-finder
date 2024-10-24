@@ -57,25 +57,41 @@ function handleArchiveJson(volumeInfo, id) {
 
     document.getElementById("type").textContent = "Type: Ebook"
 
-    let downloadLink = "no"
+    let downloadLink = null
     for (let i = 0; i < volumeInfo["files"].length; i++) {
         downloadLink = volumeInfo["files"][i]["name"]
-        if (downloadLink.includes(".pdf")) {
+        let isPrivate = volumeInfo["files"][i]["private"]
+        if (isPrivate === undefined) {
+            isPrivate = false
+        }
+        // console.log(isPrivate)
+        if (downloadLink.includes(".pdf") && !isPrivate && !downloadLink.includes("encrypted")) {
             // console.log(`download link: ${downloadLink}`)
             break
         }
+        downloadLink = null
+        // console.log("download link in archive: "+ downloadLink)
+    }
+    let button = document.getElementById("freeSample");
+    
+    if (downloadLink === null) {
+        button.classList.add("btn-secondary")
+        button.disabled = true; 
     }
 
-    document.getElementById("freeSample").addEventListener("click", (ev) => {
+    button.addEventListener("click", (ev) => {
         let a = document.createElement("a")
         a.target = "_blank"
         a.href = `https://archive.org/download/${id}/${downloadLink}`
         a.click()
     })
 
-    document.getElementById("freeSample").innerText = "Free Download"
-
-
+    if (downloadLink === null) {
+        document.getElementById("freeSample").innerText = "Not available"
+        // console.log("not ava")
+    } else {
+        document.getElementById("freeSample").innerText = "Free Download"
+    }
  }
 function handleJson(r, id) {
     let volumeInfo = r["volumeInfo"]
@@ -115,6 +131,7 @@ function handleJson(r, id) {
      fetch(`https://archive.org/metadata/${id}`)
          .then(response => {
              response.json().then(r => {
+                // console.log(r)
                  handleArchiveJson(r, id)
              })
          })
