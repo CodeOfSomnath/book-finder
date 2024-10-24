@@ -146,20 +146,7 @@ function handleJson(books_json) {
         if (authorNames === undefined || authorNames == null) {
             authorNames = ""
         }
-        const readerLink = books[i]["accessInfo"]["webReaderLink"]
-        // console.log( books[i]) // for debuging only
-        if (readerLink === undefined) {
-            add(bookName, authorNames.toString(), description, previewImage, id, "google")
-        } else {
-            fetch(readerLink, {
-                mode: 'no-cors' // Avoids CORS restrictions but limits response details
-              }).then(res => {
-                if (res.status != 400) {
-                    add(bookName, authorNames.toString(), description, previewImage, id, "google")
-                }
-            })
-        }
-        
+        add(bookName, authorNames.toString(), description, previewImage, id, "google")   
     }
     document.getElementById("loadingScreen").style.display = "none"
     document.getElementById("books_blog").classList.remove("hidden")
