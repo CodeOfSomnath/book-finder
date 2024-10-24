@@ -30,6 +30,16 @@ function forward(searchTerm) {
 setStyleTag()
 // search listener
 document.addEventListener('DOMContentLoaded', function() {
+
+    // const urlParams = new URLSearchParams(window.location.search);
+    // if (urlParams.get("q") != null && urlParams.get("q") !== "") {
+    //     init()
+    // } else {
+    //     document.getElementById("loadingScreen").style.display = "none"
+    //     document.getElementById("not_found").classList.remove("hidden")
+    // }
+
+
     const searchForm = document.getElementById('searchForm');
     searchForm.addEventListener('submit', function(event) {
         event.preventDefault(); // Prevent the default form submission behavior
@@ -37,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Perform your search functionality here
         const searchTerm = document.getElementById('searchInput').value;
         if (searchTerm.trim().length === 0) {
-            console.log("length === 0")
+            // console.log("length === 0")
         } else {
             localStorage.setItem("search", searchTerm)
         }

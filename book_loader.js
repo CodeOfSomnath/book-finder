@@ -2,6 +2,13 @@
 //     init()
 // })
 
+function forward(searchTerm) {
+    let a = document.createElement("a")
+    a.href = `books.html?q=${searchTerm}&page_number=1`
+    a.click()
+}
+
+
 window.onload = (ev) => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get("q") != null && urlParams.get("q") !== "") {
@@ -11,6 +18,22 @@ window.onload = (ev) => {
         document.getElementById("not_found").classList.remove("hidden")
     }
 
+    // this is nedded to work navbar search bar
+    const searchForm = document.getElementById('searchForm');
+    searchForm.addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission behavior
+
+        // Perform your search functionality here
+        const searchTerm = document.getElementById('searchInput').value;
+        if (searchTerm.trim().length === 0) {
+            // console.log("length === 0")
+        } else {
+            localStorage.setItem("search", searchTerm)
+        }
+        searchTerm.replaceAll(" ", "+")
+        forward(searchTerm)
+
+    })
 }
 
 
@@ -101,6 +124,14 @@ function handleInternetArchiveJson(books_json) {
 
 }
 
+function isvalidPreview(url) {
+    fetch(url).then(res =>{
+        if (res.status == 400) {
+            
+        }
+    });
+}
+
 
 function handleJson(books_json) {
     const books = books_json["items"]
@@ -115,7 +146,20 @@ function handleJson(books_json) {
         if (authorNames === undefined || authorNames == null) {
             authorNames = ""
         }
-        add(bookName, authorNames.toString(), description, previewImage, id, "google")
+        const readerLink = books[i]["accessInfo"]["webReaderLink"]
+        // console.log( books[i]) // for debuging only
+        if (readerLink === undefined) {
+            add(bookName, authorNames.toString(), description, previewImage, id, "google")
+        } else {
+            fetch(readerLink, {
+                mode: 'no-cors' // Avoids CORS restrictions but limits response details
+              }).then(res => {
+                if (res.status != 400) {
+                    add(bookName, authorNames.toString(), description, previewImage, id, "google")
+                }
+            })
+        }
+        
     }
     document.getElementById("loadingScreen").style.display = "none"
     document.getElementById("books_blog").classList.remove("hidden")
@@ -135,7 +179,7 @@ function getContent(searchTerm, page_number) {
     // https://archive.org/search?query=c+language&and%5B%5D=mediatype%3A%22texts%22
     // https://archive.org/services/search/beta/page_production/?user_query=java+language&hits_per_page=100&page=1&filter_map={%22mediatype%22%3A{%22texts%22%3A%22inc%22}}&aggregations=false
     let hits_per_page = 20
-    console.log(`page_number: ${page_number}`)
+    // console.log(`page_number: ${page_number}`)
     fetch(`https://archive.org/services/search/beta/page_production/?user_query=${searchTerm}&hits_per_page=${hits_per_page}&page=${page_number}&filter_map={%22mediatype%22%3A{%22texts%22%3A%22inc%22}}&aggregations=false`)
         .then(response => {
             response.json().then(r => {
@@ -155,7 +199,10 @@ function getContent(searchTerm, page_number) {
 function init() {
     const urlParams = new URLSearchParams(window.location.search);
     let searchItem = urlParams.get("q")
-    console.log(`search term ${searchItem}`)
+    // console.log(`search term ${searchItem}`)
     getContent(searchItem, Number(urlParams.get("page_number")))
     localStorage.removeItem("search")
 }
+
+
+// this code is nessary for search working

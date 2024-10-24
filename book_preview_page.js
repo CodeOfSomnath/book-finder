@@ -1,7 +1,40 @@
+
+function forward(searchTerm) {
+    let a = document.createElement("a")
+    a.href = `books.html?q=${searchTerm}&page_number=1`
+    a.click()
+}
+
+
+
 window.onload = (ev) => {
-    console.log("on book")
+    // console.log("on book")
     const urlParams = new URLSearchParams(window.location.search);
     init(urlParams.get("id"), urlParams.get("type"))
+
+    // this is nedded to work navbar search bar
+    // if (urlParams.get("q") != null && urlParams.get("q") !== "") {
+    //     init()
+    // } else {
+    //     document.getElementById("loadingScreen").style.display = "none"
+    //     document.getElementById("not_found").classList.remove("hidden")
+    // }
+
+    const searchForm = document.getElementById('searchForm');
+    searchForm.addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission behavior
+
+        // Perform your search functionality here
+        const searchTerm = document.getElementById('searchInput').value;
+        if (searchTerm.trim().length === 0) {
+            // console.log("length === 0")
+        } else {
+            localStorage.setItem("search", searchTerm)
+        }
+        searchTerm.replaceAll(" ", "+")
+        forward(searchTerm)
+
+    })
 
 }
 
@@ -28,7 +61,7 @@ function handleArchiveJson(volumeInfo, id) {
     for (let i = 0; i < volumeInfo["files"].length; i++) {
         downloadLink = volumeInfo["files"][i]["name"]
         if (downloadLink.includes(".pdf")) {
-            console.log(`download link: ${downloadLink}`)
+            // console.log(`download link: ${downloadLink}`)
             break
         }
     }
@@ -90,7 +123,7 @@ function handleJson(r, id) {
  }
 
 function initGoogle(id) {
-    console.log("init called")
+    // console.log("init called")
     // let id = localStorage.getItem("id")
     fetch(`https://www.googleapis.com/books/v1/volumes/${id}`)
         .then(response => {
